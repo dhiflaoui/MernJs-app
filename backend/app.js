@@ -2,11 +2,13 @@ var express = require('express');
 const postsRoutes = require("./routes/posts");
 const mongoose = require ('mongoose');
 const app = express();
+const path = require ('path');
 
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // parse form data client
+app.use("/images",express.static(path.join("backend/images")));//load image 
 
 
 //connection to mongoose
