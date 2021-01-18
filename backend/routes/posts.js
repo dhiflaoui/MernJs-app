@@ -6,6 +6,7 @@ const router = require('express').Router();
 
 //multer upload file
 const multer = require ('multer');
+const { count } = require('console');
 
 const MIME_TYPE_MAP = {
     "image/png": "png",
@@ -80,11 +81,27 @@ router.put(
 
 //get list of postaddPost
 router.get("", (req, res, next) => {
-    Post.find().then(documents => {
-        res.status(200).json({
-        message: "Posts fetched successfully!",
-        posts: documents
-        });
+    const pageSize = +req.query.pagesize;//we add + to convert 'string' result to 'number' 
+    const currentPage= req.query.page;
+    const postQuery = Post.find();
+    let fetchPosts;
+    //pagination
+    if (pageSize && currentPage){
+        postQuery
+        .skip(pageSize * (currentPage - 1))
+        .limit(pageSize);
+    }
+    postQuery
+        .then(documents => {
+            fetchPosts = documents;
+            return Post.count();
+    })
+        .then(count => {
+            res.status(200).json({
+            message: "Posts fetched successfully!",
+            posts: fetchPosts,
+            MaxPosts : count //number posts in db 
+            });
     });
 });
 
